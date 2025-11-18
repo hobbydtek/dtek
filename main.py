@@ -15,7 +15,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 # ================= НАЛАШТУВАННЯ =================
 # Токен беремо зі змінних середовища Render (безпека)
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
+BOT_TOKEN = "8599975771:AAEHrZ15guNC80JJDbjg7Z2vKfvrlfubW5M "("BOT_TOKEN")
 
 MY_CITY_TEXT = "с. Старі Петрівці"
 MY_STREET_TEXT = "Князя Святослава"
@@ -164,3 +164,4 @@ if __name__ == "__main__":
     # Запускаємо бота
     print("Бот запущено!")
     bot.polling(non_stop=True)
+
