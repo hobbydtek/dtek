@@ -1,27 +1,24 @@
-FROM python:3.9-slim
+# Використовуємо повну версію Python (не slim), щоб уникнути проблем з бібліотеками
+FROM python:3.9
 
-# 1. Встановлюємо wget та gnupg (потрібен для apt-key)
-# Ми робимо це першим кроком і одразу очищуємо кеш, щоб зменшити розмір
-RUN apt-get update && apt-get install -y \
-    wget \
-    gnupg \
-    unzip \
-    curl \
-    --no-install-recommends
+# 1. Оновлюємо систему і ставимо wget
+RUN apt-get update && apt-get install -y wget --no-install-recommends
 
-# 2. Додаємо ключі Google та репозиторій Chrome
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-    sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+# 2. Завантажуємо інсталятор Chrome напряму
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 
-# 3. Встановлюємо сам Google Chrome
-RUN apt-get update && apt-get install -y google-chrome-stable
+# 3. Встановлюємо Chrome через apt (він сам підтягне залежності)
+RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
 
-# 4. Налаштовуємо робочу папку
+# 4. Видаляємо інсталятор, щоб очистити місце
+RUN rm google-chrome-stable_current_amd64.deb
+
+# 5. Налаштування робочої папки
 WORKDIR /app
 COPY . /app
 
-# 5. Встановлюємо бібліотеки Python
+# 6. Встановлення Python-бібліотек
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 6. Запускаємо бота
+# 7. Запуск
 CMD ["python", "main.py"]
