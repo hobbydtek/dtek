@@ -14,14 +14,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
 # ================= НАЛАШТУВАННЯ =================
-# Токен беремо зі змінних середовища Render (безпека)
-BOT_TOKEN = "8599975771:AAEHrZ15guNC80JJDbjg7Z2vKfvrlfubW5M"
+# Токен з налаштувань Render
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 MY_CITY_TEXT = "с. Старі Петрівці"
 MY_STREET_TEXT = "Князя Святослава"
 MY_HOUSE_TEXT = "167а"
 
-# XPATH (Ті самі, що працювали)
+# XPATH
 XPATH_CITY_ITEM   = "/html/body/div[1]/div[1]/main/section[3]/div/section/div[2]/div[1]/form/div/div[1]/div/div/div/strong"
 XPATH_STREET_ITEM = "/html/body/div[1]/div[1]/main/section[3]/div/section/div[2]/div[1]/form/div/div[2]/div/div/div/strong"
 XPATH_HOUSE_ITEM  = "/html/body/div[1]/div[1]/main/section[3]/div/section/div[2]/div[1]/form/div/div[3]/div/div/div/strong"
@@ -69,7 +69,6 @@ def click_relative_to_header(driver, wait):
         return False
 
 def get_dtek_screenshots():
-    # --- НАЛАШТУВАННЯ ДЛЯ DOCKER (RENDER) ---
     chrome_options = Options()
     chrome_options.add_argument("--headless") 
     chrome_options.add_argument("--no-sandbox")
@@ -77,7 +76,6 @@ def get_dtek_screenshots():
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1280,1800")
     
-    # Webdriver Manager сам встановить правильний драйвер
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
     
     screenshots = [] 
@@ -145,24 +143,23 @@ def send_light(message):
     else:
         bot.send_message(message.chat.id, "Помилка.")
 
-# --- ВЕБ-СЕРВЕР ЩОБ RENDER НЕ ЗАСИНАВ ---
+# --- ВЕБ-СЕРВЕР ---
 @server.route("/")
 def webhook():
-    bot.remove_webhook()
-    bot.set_webhook(url='https://YOUR-APP-NAME.onrender.com/' + BOT_TOKEN)
     return "Bot is running!", 200
 
 def run_web_server():
-    # Render вимагає слухати порт 10000 (або змінну PORT)
     server.run(host="0.0.0.0", port=int(os.environ.get('PORT', 10000)))
 
 if __name__ == "__main__":
-    # Запускаємо веб-сервер у окремому потоці
+    # Запускаємо веб-сервер
     t = Thread(target=run_web_server)
     t.start()
     
-    # Запускаємо бота
-    print("Бот запущено!")
+    # === ВИПРАВЛЕННЯ: Видаляємо вебхук перед запуском ===
+    print("♻️ Очищаю старий вебхук...")
+    bot.remove_webhook()
+    time.sleep(1)
+    
+    print("✅ Бот запущено!")
     bot.polling(non_stop=True)
-
-
