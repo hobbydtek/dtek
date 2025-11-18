@@ -14,8 +14,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
 # ================= НАЛАШТУВАННЯ =================
-# Токен з налаштувань Render
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
+# ВАШ ТОКЕН ВПИСАНИЙ ПРЯМО СЮДИ:
+BOT_TOKEN = "8599975771:AAEHrZ15guNC80JJDbjg7Z2vKfvrlfubW5M"
 
 MY_CITY_TEXT = "с. Старі Петрівці"
 MY_STREET_TEXT = "Князя Святослава"
@@ -156,10 +156,14 @@ if __name__ == "__main__":
     t = Thread(target=run_web_server)
     t.start()
     
-    # === ВИПРАВЛЕННЯ: Видаляємо вебхук перед запуском ===
-    print("♻️ Очищаю старий вебхук...")
-    bot.remove_webhook()
-    time.sleep(1)
-    
+    # === ВИПРАВЛЕННЯ ПОМИЛКИ 409 ===
+    # Видаляємо старий вебхук, щоб дозволити getUpdates
+    print("♻️ Скидаю вебхук...")
+    try:
+        bot.remove_webhook()
+        time.sleep(1)
+    except Exception as e:
+        print(f"⚠️ Не вдалося скинути вебхук (це ок, якщо його не було): {e}")
+
     print("✅ Бот запущено!")
     bot.polling(non_stop=True)
